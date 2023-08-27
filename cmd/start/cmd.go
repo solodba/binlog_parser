@@ -1,6 +1,7 @@
 package start
 
 import (
+	"github.com/solodba/binlog_parser/protocol"
 	"github.com/spf13/cobra"
 )
 
@@ -31,6 +32,7 @@ var Cmd = &cobra.Command{
 
 // 服务结构体
 type Server struct {
+	ParseService *protocol.ParseService
 }
 
 // 服务结构体初始化函数
