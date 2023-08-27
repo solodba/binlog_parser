@@ -6,8 +6,12 @@ import (
 
 // 全局参数
 var (
-	startTime string
-	endTime   string
+	Username  string
+	Password  string
+	Host      string
+	Port      int32
+	StartTime string
+	EndTime   string
 )
 
 // 项目启动子命令
@@ -46,6 +50,10 @@ func (s *Server) Stop() error {
 
 // 初始化函数
 func init() {
-	Cmd.PersistentFlags().StringVarP(&startTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
-	Cmd.PersistentFlags().StringVarP(&endTime, "endtime", "e", "1970-01-01 00:00:00", "mysql binlog parse end time")
+	Cmd.PersistentFlags().StringVarP(&Username, "username", "u", "test", "connect mysql username")
+	Cmd.PersistentFlags().StringVarP(&Password, "password", "p", "test", "connect mysql password")
+	Cmd.PersistentFlags().StringVarP(&Host, "host", "m", "127.0.0.1", "mysql host ip")
+	Cmd.PersistentFlags().Int32VarP(&Port, "port", "P", 3306, "mysql port")
+	Cmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
+	Cmd.PersistentFlags().StringVarP(&EndTime, "endtime", "e", "1970-01-01 00:00:00", "mysql binlog parse end time")
 }
