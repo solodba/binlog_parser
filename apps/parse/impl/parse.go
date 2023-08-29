@@ -3,12 +3,15 @@ package impl
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/go-mysql-org/go-mysql/mysql"
+	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/solodba/binlog_parser/apps/parse"
-	"github.com/solodba/mcube/logger"
 )
 
 // 查询binlog mode
@@ -98,7 +101,6 @@ func (i *impl) GetBinLogPosition(ctx context.Context) (*parse.BinLogPositionResp
 	// binLogName := binLogPath.BinLogPath + `/` + i.c.CmdConf.BinLogName
 	cmd := fmt.Sprintf(`mysqlbinlog --read-from-remote-server -u%s -h%s -p"%s" -P%d --start-datetime="%s" --stop-datetime="%s" "%s" -vv`,
 		i.c.CmdConf.Username, i.c.CmdConf.Host, i.c.CmdConf.Password, i.c.CmdConf.Port, i.c.CmdConf.StartTime, i.c.CmdConf.EndTime, i.c.CmdConf.BinLogName)
-	logger.L().Info().Msgf(cmd)
 	outPutByte, err := exec.CommandContext(ctx, "/bin/sh", "-c", cmd).Output()
 	if err != nil {
 		return nil, err
@@ -124,4 +126,46 @@ func (i *impl) GetBinLogPosition(ctx context.Context) (*parse.BinLogPositionResp
 	}
 	binLogPosDateSet.Total = len(binLogPosDateSet.Items)
 	return binLogPosDateSet.GetStartAndEndPos()
+}
+
+// 解析binlog日志
+func (i *impl) ParseBinLog(ctx context.Context) (*parse.ParseBinLogResponse, error) {
+	pos, err := i.GetBinLogPosition(ctx)
+	if err != nil {
+		return nil, err
+	}
+	posList := strings.Split(pos.StartPos, " ")
+	posStr := posList[len(posList)-1]
+	posNum, err := strconv.Atoi(posStr)
+	if err != nil {
+		return nil, err
+	}
+	cfg := replication.BinlogSyncerConfig{
+		ServerID: 6666,
+		Flavor:   "mysql",
+		User:     i.c.CmdConf.Username,
+		Password: i.c.CmdConf.Password,
+		Host:     i.c.CmdConf.Host,
+		Port:     uint16(i.c.CmdConf.Port),
+	}
+	syncer := replication.NewBinlogSyncer(cfg)
+	binLogPath, err := i.GetBinLogPath(ctx)
+	if err != nil {
+		return nil, err
+	}
+	streamer, err := syncer.StartSync(mysql.Position{
+		Name: binLogPath.BinLogPath + `/` + i.c.CmdConf.BinLogName,
+		Pos:  uint32(posNum),
+	})
+	if err != nil {
+		return nil, err
+	}
+	for {
+		ev, err := streamer.GetEvent(ctx)
+		if err == context.DeadlineExceeded {
+			continue
+		}
+		ev.Dump(os.Stdout)
+	}
+	return nil, nil
 }

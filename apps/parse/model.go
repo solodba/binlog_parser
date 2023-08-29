@@ -95,11 +95,15 @@ func (b *BinLogPosDateSet) AddItems(items ...*BinLogPosDate) {
 
 // 获取起始时间对应的position
 func (b *BinLogPosDateSet) GetStartAndEndPos() (*BinLogPositionResponse, error) {
-	if len(b.Items) == 0 {
+	if len(b.Items) == 0 || len(b.Items) == 1 {
 		return nil, fmt.Errorf("未找到起始时间对应的Position")
 	}
 	binLogPosRes := NewBinLogPositionResponse()
-	binLogPosRes.StartPos = b.Items[0].Pos
+	binLogPosRes.StartPos = b.Items[1].Pos
 	binLogPosRes.EndPos = b.Items[len(b.Items)-1].Pos
 	return binLogPosRes, nil
+}
+
+// ParseBinLogResponse结构体
+type ParseBinLogResponse struct {
 }

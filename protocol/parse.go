@@ -26,7 +26,7 @@ func NewParseService() *ParseService {
 
 // binlog parse服务启动方法
 func (s *ParseService) Start() error {
-	binLogPos, err := s.svc.GetBinLogPosition(ctx)
+	binLogPos, err := s.svc.ParseBinLog(ctx)
 	if err != nil {
 		return err
 	}
