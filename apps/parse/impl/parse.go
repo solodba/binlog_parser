@@ -123,8 +123,5 @@ func (i *impl) GetBinLogPosition(ctx context.Context) (*parse.BinLogPositionResp
 		}
 	}
 	binLogPosDateSet.Total = len(binLogPosDateSet.Items)
-	for _, hu := range binLogPosDateSet.Items {
-		fmt.Println(*hu)
-	}
-	return nil, nil
+	return binLogPosDateSet.GetStartAndEndPos()
 }

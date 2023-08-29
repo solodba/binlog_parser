@@ -1,5 +1,7 @@
 package parse
 
+import "fmt"
+
 // BinLogResponse结构体
 type BinLogResponse struct {
 	VariableName string
@@ -53,7 +55,13 @@ func (a *AllBinLogPathResponse) AddItems(items ...*BinLogPathResponse) {
 
 // BinLogPositionResponse结构体
 type BinLogPositionResponse struct {
-	BinLogPos string
+	StartPos string
+	EndPos   string
+}
+
+// BinLogPositionResponse构造函数
+func NewBinLogPositionResponse() *BinLogPositionResponse {
+	return &BinLogPositionResponse{}
 }
 
 // 存放Binlog Position和日期结构体
@@ -83,4 +91,15 @@ func NewBinLogPosDateSet() *BinLogPosDateSet {
 // BinLogPosDateSet添加方法
 func (b *BinLogPosDateSet) AddItems(items ...*BinLogPosDate) {
 	b.Items = append(b.Items, items...)
+}
+
+// 获取起始时间对应的position
+func (b *BinLogPosDateSet) GetStartAndEndPos() (*BinLogPositionResponse, error) {
+	if len(b.Items) == 0 {
+		return nil, fmt.Errorf("未找到起始时间对应的Position")
+	}
+	binLogPosRes := NewBinLogPositionResponse()
+	binLogPosRes.StartPos = b.Items[0].Pos
+	binLogPosRes.EndPos = b.Items[len(b.Items)-1].Pos
+	return binLogPosRes, nil
 }
