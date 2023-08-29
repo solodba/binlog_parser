@@ -7,11 +7,11 @@ import (
 )
 
 func TestIsBinLogMode(t *testing.T) {
-	binLogModeRes, err := svc.QueryBinLogMode(ctx)
+	binLogRes, err := svc.QueryBinLogMode(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(tools.MustToJson(binLogModeRes))
+	t.Log(tools.MustToJson(binLogRes))
 }
 
 func TestIsBinLog(t *testing.T) {
@@ -20,4 +20,12 @@ func TestIsBinLog(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(tools.MustToJson(isBinLogRes))
+}
+
+func TestQueryBinLogFormat(t *testing.T) {
+	binlogRes, err := svc.QueryBinLogFormat(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(tools.MustToJson(binlogRes))
 }

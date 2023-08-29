@@ -9,8 +9,9 @@ const (
 
 type Service interface {
 	// 查询binlog mode
-	QueryBinLogMode(context.Context) (*BinLogModeResponse, error)
+	QueryBinLogMode(context.Context) (*BinLogResponse, error)
 	// 判断binlog是否开启
 	IsBinLog(context.Context) (*IsBinLogResponse, error)
-	// 查询当前
+	// 查询当前binlog记录模式
+	QueryBinLogFormat(context.Context) (*BinLogResponse, error)
 }

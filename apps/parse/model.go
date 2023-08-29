@@ -1,14 +1,14 @@
 package parse
 
-// BinLogModeResponse结构体
-type BinLogModeResponse struct {
+// BinLogResponse结构体
+type BinLogResponse struct {
 	VariableName string
 	Value        string
 }
 
-// BinLogModeResponse结构体构造函数
-func NewBinLogModeResponse() *BinLogModeResponse {
-	return &BinLogModeResponse{}
+// BinLogResponse结构体构造函数
+func NewBinLogResponse() *BinLogResponse {
+	return &BinLogResponse{}
 }
 
 // IsBinLogResponse结构体

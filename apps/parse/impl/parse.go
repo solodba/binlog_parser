@@ -8,10 +8,10 @@ import (
 )
 
 // 查询binlog mode
-func (i *impl) QueryBinLogMode(ctx context.Context) (*parse.BinLogModeResponse, error) {
+func (i *impl) QueryBinLogMode(ctx context.Context) (*parse.BinLogResponse, error) {
 	sql := `show global variables like 'log_bin'`
 	row := i.db.QueryRowContext(ctx, sql)
-	res := parse.NewBinLogModeResponse()
+	res := parse.NewBinLogResponse()
 	err := row.Scan(&res.VariableName, &res.Value)
 	if err != nil {
 		return nil, err
@@ -30,4 +30,16 @@ func (i *impl) IsBinLog(ctx context.Context) (*parse.IsBinLogResponse, error) {
 		isBinLogRes.On = true
 	}
 	return isBinLogRes, nil
+}
+
+// 查询当前binlog记录模式
+func (i *impl) QueryBinLogFormat(ctx context.Context) (*parse.BinLogResponse, error) {
+	sql := `show global variables like 'binlog_format'`
+	row := i.db.QueryRowContext(ctx, sql)
+	res := parse.NewBinLogResponse()
+	err := row.Scan(&res.VariableName, &res.Value)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
