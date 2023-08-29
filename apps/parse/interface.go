@@ -16,4 +16,6 @@ type Service interface {
 	QueryBinLogFormat(context.Context) (*BinLogResponse, error)
 	// 获取需要解析的binlog路径
 	GetBinLogPath(context.Context) (*BinLogPathResponse, error)
+	// 获取所有binglog路径
+	GetAllBinLogPath(context.Context) (*AllBinLogPathResponse, error)
 }

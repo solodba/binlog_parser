@@ -32,3 +32,21 @@ func NewBinLogPathResponse(path string) *BinLogPathResponse {
 		BinLogPath: path,
 	}
 }
+
+// AllBinLogPathResponse结构体
+type AllBinLogPathResponse struct {
+	Total int
+	Items []*BinLogPathResponse
+}
+
+// AllBinLogPathResponse构造函数
+func NewAllBinLogPathResponse() *AllBinLogPathResponse {
+	return &AllBinLogPathResponse{
+		Items: make([]*BinLogPathResponse, 0),
+	}
+}
+
+// AllBinLogPathResponse结构体添加方法
+func (a *AllBinLogPathResponse) AddItems(items ...*BinLogPathResponse) {
+	a.Items = append(a.Items, items...)
+}

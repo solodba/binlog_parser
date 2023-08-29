@@ -37,3 +37,11 @@ func TestGetBinLogPath(t *testing.T) {
 	}
 	t.Log(tools.MustToJson(binLogPathRes))
 }
+
+func TestGetAllBinLogPath(t *testing.T) {
+	allBinLogRes, err := svc.GetAllBinLogPath(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(tools.MustToJson(allBinLogRes))
+}

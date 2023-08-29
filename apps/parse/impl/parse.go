@@ -58,3 +58,29 @@ func (i *impl) GetBinLogPath(ctx context.Context) (*parse.BinLogPathResponse, er
 	binLogPathRes := parse.NewBinLogPathResponse(baseDir)
 	return binLogPathRes, nil
 }
+
+// 获取所有binglog路径
+func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathResponse, error) {
+	binLogPathRes, err := i.GetBinLogPath(ctx)
+	if err != nil {
+		return nil, err
+	}
+	sql := `show binary logs`
+	allBinLogPath := parse.NewAllBinLogPathResponse()
+	rows, err := i.db.QueryContext(ctx, sql)
+	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+	var logName, fileSize, encrypted string
+	for rows.Next() {
+		err = rows.Scan(&logName, &fileSize, &encrypted)
+		if err != nil {
+			return nil, err
+		}
+		binLogPath := parse.NewBinLogPathResponse(binLogPathRes.BinLogPath + `/` + logName)
+		allBinLogPath.AddItems(binLogPath)
+	}
+	allBinLogPath.Total = len(allBinLogPath.Items)
+	return allBinLogPath, nil
+}
