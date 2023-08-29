@@ -18,4 +18,6 @@ type Service interface {
 	GetBinLogPath(context.Context) (*BinLogPathResponse, error)
 	// 获取所有binglog路径
 	GetAllBinLogPath(context.Context) (*AllBinLogPathResponse, error)
+	// 通过时间获取binlog position
+	GetBinLogPosition(context.Context) (*BinLogPositionResponse, error)
 }

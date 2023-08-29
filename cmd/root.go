@@ -13,6 +13,13 @@ import (
 // 全局参数
 var (
 	showVersion bool
+	Username    string
+	Password    string
+	Host        string
+	Port        int32
+	StartTime   string
+	EndTime     string
+	BinLogName  string
 )
 
 // 根命令
@@ -31,25 +38,30 @@ var RootCmd = &cobra.Command{
 }
 
 // 加载全局配置
-func LoadConfigFromCmd() error {
+func LoadConfigFromCmd() {
 	conf.Conf = conf.NewDefaultConfig()
-	conf.Conf.MySQL.Username = start.Username
-	conf.Conf.MySQL.Password = start.Password
-	conf.Conf.MySQL.Host = start.Host
-	conf.Conf.MySQL.Port = start.Port
+	conf.Conf.MySQL.Username = Username
+	conf.Conf.MySQL.Password = Password
+	conf.Conf.MySQL.Host = Host
+	conf.Conf.MySQL.Port = Port
 	conf.Conf.MySQL.DB = "mysql"
 	conf.Conf.MySQL.MaxOpenConn = 50
 	conf.Conf.MySQL.MaxIdleConn = 10
 	conf.Conf.MySQL.MaxLifeTime = 600
 	conf.Conf.MySQL.MaxIdleTime = 300
-	return nil
+	conf.Conf.CmdConf.Username = Username
+	conf.Conf.CmdConf.Password = Password
+	conf.Conf.CmdConf.Host = Host
+	conf.Conf.CmdConf.Port = Port
+	conf.Conf.CmdConf.StartTime = StartTime
+	conf.Conf.CmdConf.EndTime = EndTime
+	conf.Conf.CmdConf.BinLogName = BinLogName
 }
 
 // 初始化函数
 func Initial() {
-	err := LoadConfigFromCmd()
-	cobra.CheckErr(err)
-	err = apps.InitInternalApps()
+	LoadConfigFromCmd()
+	err := apps.InitInternalApps()
 	cobra.CheckErr(err)
 }
 
@@ -63,5 +75,12 @@ func Execute() {
 
 // 初始化函数
 func init() {
-	RootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "show project mcenter version")
+	RootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "show project binlog parse version")
+	RootCmd.PersistentFlags().StringVarP(&Username, "username", "u", "test", "connect mysql username")
+	RootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "test", "connect mysql password")
+	RootCmd.PersistentFlags().StringVarP(&Host, "host", "m", "127.0.0.1", "mysql host ip")
+	RootCmd.PersistentFlags().Int32VarP(&Port, "port", "P", 3306, "mysql port")
+	RootCmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
+	RootCmd.PersistentFlags().StringVarP(&EndTime, "endtime", "e", "1970-01-01 23:59:59", "mysql binlog parse end time")
+	RootCmd.PersistentFlags().StringVarP(&BinLogName, "binlogname", "f", "xxx", "mysql binlog name")
 }

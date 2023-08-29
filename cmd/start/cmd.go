@@ -5,17 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// 全局参数
-var (
-	Username   string
-	Password   string
-	Host       string
-	Port       int32
-	StartTime  string
-	EndTime    string
-	BinLogName string
-)
-
 // 项目启动子命令
 var Cmd = &cobra.Command{
 	Use:     "start",
@@ -38,26 +27,20 @@ type Server struct {
 
 // 服务结构体初始化函数
 func NewServer() *Server {
-	return &Server{}
+	return &Server{
+		ParseService: protocol.NewParseService(),
+	}
 }
 
 // Server服务启动方法
 func (s *Server) Start() error {
+	if err := s.ParseService.Start(); err != nil {
+		return err
+	}
 	return nil
 }
 
 // Server服务停止方法
 func (s *Server) Stop() error {
 	return nil
-}
-
-// 初始化函数
-func init() {
-	Cmd.PersistentFlags().StringVarP(&Username, "username", "u", "test", "connect mysql username")
-	Cmd.PersistentFlags().StringVarP(&Password, "password", "p", "test", "connect mysql password")
-	Cmd.PersistentFlags().StringVarP(&Host, "host", "m", "127.0.0.1", "mysql host ip")
-	Cmd.PersistentFlags().Int32VarP(&Port, "port", "P", 3306, "mysql port")
-	Cmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
-	Cmd.PersistentFlags().StringVarP(&EndTime, "endtime", "e", "1970-01-01 23:59:59", "mysql binlog parse end time")
-	Cmd.PersistentFlags().StringVarP(&BinLogName, "binlogname", "f", "xxx", "mysql binlog name")
 }

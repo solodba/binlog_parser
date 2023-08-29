@@ -12,7 +12,8 @@ var (
 
 // Config结构体
 type Config struct {
-	MySQL *MySQL
+	MySQL   *MySQL
+	CmdConf *CmdConf
 }
 
 // MySQL结构体
@@ -43,9 +44,26 @@ func NewDefaultMySQL() *MySQL {
 	}
 }
 
+// CmdConf结构体
+type CmdConf struct {
+	Username   string
+	Password   string
+	Host       string
+	Port       int32
+	StartTime  string
+	EndTime    string
+	BinLogName string
+}
+
+// CmdConf结构体构造函数
+func NewDefaultCmdConf() *CmdConf {
+	return &CmdConf{}
+}
+
 // Config结构体构造函数
 func NewDefaultConfig() *Config {
 	return &Config{
-		MySQL: NewDefaultMySQL(),
+		MySQL:   NewDefaultMySQL(),
+		CmdConf: NewDefaultCmdConf(),
 	}
 }
