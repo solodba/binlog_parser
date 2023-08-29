@@ -14,4 +14,6 @@ type Service interface {
 	IsBinLog(context.Context) (*IsBinLogResponse, error)
 	// 查询当前binlog记录模式
 	QueryBinLogFormat(context.Context) (*BinLogResponse, error)
+	// 获取需要解析的binlog路径
+	GetBinLogPath(context.Context) (*BinLogPathResponse, error)
 }

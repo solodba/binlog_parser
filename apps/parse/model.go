@@ -20,3 +20,15 @@ type IsBinLogResponse struct {
 func NewIsBinLogResponse() *IsBinLogResponse {
 	return &IsBinLogResponse{}
 }
+
+// BinLogPathResponse结构体
+type BinLogPathResponse struct {
+	BinLogPath string
+}
+
+// BinLogPathResponse构造函数
+func NewBinLogPathResponse(path string) *BinLogPathResponse {
+	return &BinLogPathResponse{
+		BinLogPath: path,
+	}
+}

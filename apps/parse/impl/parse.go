@@ -43,3 +43,18 @@ func (i *impl) QueryBinLogFormat(ctx context.Context) (*parse.BinLogResponse, er
 	}
 	return res, nil
 }
+
+// 获取需要解析的binlog路径
+func (i *impl) GetBinLogPath(ctx context.Context) (*parse.BinLogPathResponse, error) {
+	sql := `show global variables like 'log_bin_basename'`
+	row := i.db.QueryRowContext(ctx, sql)
+	binLogRes := parse.NewBinLogResponse()
+	err := row.Scan(&binLogRes.VariableName, &binLogRes.Value)
+	if err != nil {
+		return nil, err
+	}
+	pathList := strings.Split(binLogRes.Value, `/`)
+	baseDir := strings.Join(pathList[0:len(pathList)-1], `/`)
+	binLogPathRes := parse.NewBinLogPathResponse(baseDir)
+	return binLogPathRes, nil
+}

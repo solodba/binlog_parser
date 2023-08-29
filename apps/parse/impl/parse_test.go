@@ -29,3 +29,11 @@ func TestQueryBinLogFormat(t *testing.T) {
 	}
 	t.Log(tools.MustToJson(binlogRes))
 }
+
+func TestGetBinLogPath(t *testing.T) {
+	binLogPathRes, err := svc.GetBinLogPath(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(tools.MustToJson(binLogPathRes))
+}
