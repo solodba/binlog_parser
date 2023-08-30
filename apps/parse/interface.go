@@ -10,6 +10,8 @@ const (
 type Service interface {
 	// 查询binlog mode
 	QueryBinLogMode(context.Context) (*BinLogResponse, error)
+	// 查询mysql server id
+	QueryMysqlServerId(context.Context) (*MysqlServerIdResponse, error)
 	// 判断binlog是否开启
 	IsBinLog(context.Context) (*IsBinLogResponse, error)
 	// 查询当前binlog记录模式

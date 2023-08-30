@@ -26,6 +26,11 @@ func (i *impl) QueryBinLogMode(ctx context.Context) (*parse.BinLogResponse, erro
 	return res, nil
 }
 
+// 查询mysql server id
+func (i *impl) QueryMysqlServerId(ctx context.Context) (*parse.MysqlServerIdResponse, error) {
+	return nil, nil
+}
+
 // 判断binlog是否开启
 func (i *impl) IsBinLog(ctx context.Context) (*parse.IsBinLogResponse, error) {
 	binLogModeRes, err := i.QueryBinLogMode(ctx)
