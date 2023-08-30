@@ -51,7 +51,6 @@ type CmdConf struct {
 	Host       string
 	Port       int32
 	StartTime  string
-	EndTime    string
 	BinLogName string
 }
 

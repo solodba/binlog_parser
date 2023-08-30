@@ -23,5 +23,5 @@ type Service interface {
 	// 通过时间获取binlog position
 	GetBinLogPosition(context.Context) (*BinLogPositionResponse, error)
 	// 解析binlog日志
-	ParseBinLog(context.Context) (*ParseBinLogResponse, error)
+	ParseBinLog(context.Context)
 }

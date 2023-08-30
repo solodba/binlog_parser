@@ -10,7 +10,7 @@ var Cmd = &cobra.Command{
 	Use:     "start",
 	Short:   "binlog-parser start service",
 	Long:    "binlog-parser service",
-	Example: `binlog-parser start -s "2023-08-27 10:00:00"-e "2023-08-27 10:30:00"`,
+	Example: `./binlog_parser start  -u root -p Root@123 -m 192.168.1.140 -P 3306 -s "2023-08-30 23:50:00" -f mysql-bin.000009`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		srv := NewServer()
 		if err := srv.Start(); err != nil {

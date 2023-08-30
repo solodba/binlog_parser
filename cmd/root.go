@@ -18,7 +18,6 @@ var (
 	Host        string
 	Port        int32
 	StartTime   string
-	EndTime     string
 	BinLogName  string
 )
 
@@ -54,7 +53,6 @@ func LoadConfigFromCmd() {
 	conf.Conf.CmdConf.Host = Host
 	conf.Conf.CmdConf.Port = Port
 	conf.Conf.CmdConf.StartTime = StartTime
-	conf.Conf.CmdConf.EndTime = EndTime
 	conf.Conf.CmdConf.BinLogName = BinLogName
 }
 
@@ -81,6 +79,5 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&Host, "host", "m", "127.0.0.1", "mysql host ip")
 	RootCmd.PersistentFlags().Int32VarP(&Port, "port", "P", 3306, "mysql port")
 	RootCmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
-	RootCmd.PersistentFlags().StringVarP(&EndTime, "endtime", "e", "1970-01-01 23:59:59", "mysql binlog parse end time")
 	RootCmd.PersistentFlags().StringVarP(&BinLogName, "binlogname", "f", "xxx", "mysql binlog name")
 }

@@ -2,7 +2,6 @@ package protocol
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/solodba/binlog_parser/apps/parse"
 	"github.com/solodba/mcube/apps"
@@ -26,11 +25,7 @@ func NewParseService() *ParseService {
 
 // binlog parse服务启动方法
 func (s *ParseService) Start() error {
-	binLogPos, err := s.svc.ParseBinLog(ctx)
-	if err != nil {
-		return err
-	}
-	fmt.Println(binLogPos)
+	s.svc.ParseBinLog(ctx)
 	return nil
 }
 

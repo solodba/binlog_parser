@@ -1,6 +1,10 @@
 package parse
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 // BinLogResponse结构体
 type BinLogResponse struct {
@@ -55,8 +59,8 @@ func (a *AllBinLogPathResponse) AddItems(items ...*BinLogPathResponse) {
 
 // BinLogPositionResponse结构体
 type BinLogPositionResponse struct {
-	StartPos string
-	EndPos   string
+	StartPos int64
+	EndPos   int64
 }
 
 // BinLogPositionResponse构造函数
@@ -99,11 +103,17 @@ func (b *BinLogPosDateSet) GetStartAndEndPos() (*BinLogPositionResponse, error) 
 		return nil, fmt.Errorf("未找到起始时间对应的Position")
 	}
 	binLogPosRes := NewBinLogPositionResponse()
-	binLogPosRes.StartPos = b.Items[1].Pos
-	binLogPosRes.EndPos = b.Items[len(b.Items)-1].Pos
+	posStartList := strings.Split(b.Items[1].Pos, " ")
+	binlogStartPos, err := strconv.Atoi(posStartList[len(posStartList)-1])
+	if err != nil {
+		return nil, err
+	}
+	binLogPosRes.StartPos = int64(binlogStartPos)
+	posEndList := strings.Split(b.Items[len(b.Items)-1].Pos, " ")
+	binLogEndPos, err := strconv.Atoi(posEndList[len(posEndList)-1])
+	if err != nil {
+		return nil, err
+	}
+	binLogPosRes.EndPos = int64(binLogEndPos)
 	return binLogPosRes, nil
-}
-
-// ParseBinLogResponse结构体
-type ParseBinLogResponse struct {
 }
