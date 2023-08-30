@@ -152,8 +152,16 @@ func (i *impl) ParseBinLog(ctx context.Context) (*parse.ParseBinLogResponse, err
 	if err != nil {
 		return nil, err
 	}
+	res, err := i.QueryMysqlServerId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	serverId, err := strconv.Atoi(res.Value)
+	if err != nil {
+		return nil, err
+	}
 	cfg := replication.BinlogSyncerConfig{
-		ServerID: 6666,
+		ServerID: uint32(serverId),
 		Flavor:   "mysql",
 		User:     i.c.CmdConf.Username,
 		Password: i.c.CmdConf.Password,
