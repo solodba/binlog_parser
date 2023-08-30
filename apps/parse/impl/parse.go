@@ -27,8 +27,15 @@ func (i *impl) QueryBinLogMode(ctx context.Context) (*parse.BinLogResponse, erro
 }
 
 // 查询mysql server id
-func (i *impl) QueryMysqlServerId(ctx context.Context) (*parse.MysqlServerIdResponse, error) {
-	return nil, nil
+func (i *impl) QueryMysqlServerId(ctx context.Context) (*parse.BinLogResponse, error) {
+	sql := `show global variables like 'server_id'`
+	row := i.db.QueryRowContext(ctx, sql)
+	res := parse.NewBinLogResponse()
+	err := row.Scan(&res.VariableName, &res.Value)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // 判断binlog是否开启

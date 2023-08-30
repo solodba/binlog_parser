@@ -14,6 +14,14 @@ func TestIsBinLogMode(t *testing.T) {
 	t.Log(tools.MustToJson(binLogRes))
 }
 
+func TestQueryMysqlServerId(t *testing.T) {
+	binLogRes, err := svc.QueryMysqlServerId(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(tools.MustToJson(binLogRes))
+}
+
 func TestIsBinLog(t *testing.T) {
 	isBinLogRes, err := svc.IsBinLog(ctx)
 	if err != nil {

@@ -107,8 +107,3 @@ func (b *BinLogPosDateSet) GetStartAndEndPos() (*BinLogPositionResponse, error) 
 // ParseBinLogResponse结构体
 type ParseBinLogResponse struct {
 }
-
-// MysqlServerIdResponse结构体
-type MysqlServerIdResponse struct {
-	ServerId string
-}
