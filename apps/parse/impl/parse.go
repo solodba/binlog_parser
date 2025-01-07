@@ -88,13 +88,13 @@ func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathRespon
 	sql := `show binary logs`
 	allBinLogPath := parse.NewAllBinLogPathResponse()
 	rows, err := i.db.QueryContext(ctx, sql)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
-	var logName, fileSize, encrypted string
+	defer rows.Close()
+	var logName, fileSize string
 	for rows.Next() {
-		err = rows.Scan(&logName, &fileSize, &encrypted)
+		err = rows.Scan(&logName, &fileSize)
 		if err != nil {
 			return nil, err
 		}
@@ -161,11 +161,11 @@ func (i *impl) ParseBinLog(ctx context.Context) {
 		Host:     i.c.CmdConf.Host,
 		Port:     uint16(i.c.CmdConf.Port),
 	}
-	binLogPath, err := i.GetBinLogPath(ctx)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
+	// binLogPath, err := i.GetBinLogPath(ctx)
+	// if err != nil {
+	// 	logger.L().Error().Msgf(err.Error())
+	// 	return
+	// }
 	isBinLogRes, err := i.IsBinLog(ctx)
 	if err != nil {
 		logger.L().Error().Msgf(err.Error())
@@ -194,7 +194,7 @@ func (i *impl) ParseBinLog(ctx context.Context) {
 	logger.L().Info().Msgf("开始解析指定binlog")
 	syncer := replication.NewBinlogSyncer(cfg)
 	streamer, err := syncer.StartSync(mysql.Position{
-		Name: binLogPath.BinLogPath + `/` + i.c.CmdConf.BinLogName,
+		Name: i.c.CmdConf.BinLogName,
 		Pos:  uint32(pos.StartPos),
 	})
 	if err != nil {
