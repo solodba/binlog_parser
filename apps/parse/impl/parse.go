@@ -92,9 +92,9 @@ func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathRespon
 		return nil, err
 	}
 	defer rows.Close()
-	var logName, fileSize string
+	var logName, fileSize, encrypted string
 	for rows.Next() {
-		err = rows.Scan(&logName, &fileSize)
+		err = rows.Scan(&logName, &fileSize, &encrypted)
 		if err != nil {
 			return nil, err
 		}
