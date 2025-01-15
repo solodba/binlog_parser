@@ -53,11 +53,3 @@ func TestGetAllBinLogPath(t *testing.T) {
 	}
 	t.Log(tools.MustToJson(allBinLogRes))
 }
-
-func TestGetBinLogPosition(t *testing.T) {
-	binLogPosRes, err := svc.GetBinLogPosition(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(tools.MustToJson(binLogPosRes))
-}

@@ -3,16 +3,9 @@ package impl
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"regexp"
-	"strconv"
 	"strings"
 
-	"github.com/go-mysql-org/go-mysql/mysql"
-	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/solodba/binlog_parser/apps/parse"
-	"github.com/solodba/mcube/logger"
 )
 
 // 查询binlog mode
@@ -66,10 +59,17 @@ func (i *impl) QueryBinLogFormat(ctx context.Context) (*parse.BinLogResponse, er
 
 // 获取需要解析的binlog路径
 func (i *impl) GetBinLogPath(ctx context.Context) (*parse.BinLogPathResponse, error) {
+	isBinlogRes, err := i.IsBinLog(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !isBinlogRes.On {
+		return nil, fmt.Errorf("%s", "mysql数据库没有开启binlog!")
+	}
 	sql := `show global variables like 'log_bin_basename'`
 	row := i.db.QueryRowContext(ctx, sql)
 	binLogRes := parse.NewBinLogResponse()
-	err := row.Scan(&binLogRes.VariableName, &binLogRes.Value)
+	err = row.Scan(&binLogRes.VariableName, &binLogRes.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -105,107 +105,15 @@ func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathRespon
 	return allBinLogPath, nil
 }
 
-// 通过时间获取binlog position
-func (i *impl) GetBinLogPosition(ctx context.Context) (*parse.BinLogPositionResponse, error) {
-	cmd := fmt.Sprintf(`mysqlbinlog --read-from-remote-server -u%s -h%s -p"%s" -P%d --start-datetime="%s" "%s" -vv`,
-		i.c.CmdConf.Username, i.c.CmdConf.Host, i.c.CmdConf.Password, i.c.CmdConf.Port, i.c.CmdConf.StartTime, i.c.CmdConf.BinLogName)
-	outPutByte, err := exec.CommandContext(ctx, "/bin/sh", "-c", cmd).Output()
-	if err != nil {
-		return nil, err
-	}
-	binLogPosDateSet := parse.NewBinLogPosDateSet()
-	binLogPosDateList := strings.Split(string(outPutByte), "#")
-	for i, item := range binLogPosDateList {
-		isMatch, err := regexp.MatchString(`at \d+`, item)
-		if err != nil {
-			return nil, err
-		}
-		if isMatch {
-			r, err := regexp.Compile(`\d{6} \d{2}:\d{2}:\d{2}`)
-			if err != nil {
-				return nil, err
-			}
-			result := r.FindString(binLogPosDateList[i+1])
-			binLogPosDate := parse.NewBinLogPosDate()
-			binLogPosDate.Pos = strings.Trim(item, "\n")
-			binLogPosDate.Date = result
-			binLogPosDateSet.AddItems(binLogPosDate)
-		}
-	}
-	binLogPosDateSet.Total = len(binLogPosDateSet.Items)
-	return binLogPosDateSet.GetStartAndEndPos()
-}
-
 // 解析binlog日志
-func (i *impl) ParseBinLog(ctx context.Context) {
-	pos, err := i.GetBinLogPosition(ctx)
+func (i *impl) ParseBinLog(ctx context.Context) error {
+	isBinlogRes, err := i.IsBinLog(ctx)
 	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
+		return err
 	}
-	res, err := i.QueryMysqlServerId(ctx)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
+	if !isBinlogRes.On {
+		return fmt.Errorf("%s", "数据库没有开启binlog!")
 	}
-	serverId, err := strconv.Atoi(res.Value)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
-	cfg := replication.BinlogSyncerConfig{
-		ServerID: uint32(serverId),
-		Flavor:   "mysql",
-		User:     i.c.CmdConf.Username,
-		Password: i.c.CmdConf.Password,
-		Host:     i.c.CmdConf.Host,
-		Port:     uint16(i.c.CmdConf.Port),
-	}
-	// binLogPath, err := i.GetBinLogPath(ctx)
-	// if err != nil {
-	// 	logger.L().Error().Msgf(err.Error())
-	// 	return
-	// }
-	isBinLogRes, err := i.IsBinLog(ctx)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
-	if !isBinLogRes.On {
-		logger.L().Error().Msgf("mysql没有开启binlog模式")
-		return
-	}
-	binLogFormatRes, err := i.QueryBinLogFormat(ctx)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
-	logger.L().Info().Msgf("当前binlog记录模式为[%s]", binLogFormatRes.Value)
-	allBinLogPathRes, err := i.GetAllBinLogPath(ctx)
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
-	binlogPathSet := make([]string, 0)
-	for _, item := range allBinLogPathRes.Items {
-		binlogPathSet = append(binlogPathSet, item.BinLogPath)
-	}
-	logger.L().Info().Msgf("所有binLog路径:[%s]", strings.Join(binlogPathSet, `,`))
-	logger.L().Info().Msgf("开始解析指定binlog")
-	syncer := replication.NewBinlogSyncer(cfg)
-	streamer, err := syncer.StartSync(mysql.Position{
-		Name: i.c.CmdConf.BinLogName,
-		Pos:  uint32(pos.StartPos),
-	})
-	if err != nil {
-		logger.L().Error().Msgf(err.Error())
-		return
-	}
-	for {
-		ev, err := streamer.GetEvent(ctx)
-		if err == context.DeadlineExceeded {
-			continue
-		}
-		ev.Dump(os.Stdout)
-	}
+
+	return nil
 }

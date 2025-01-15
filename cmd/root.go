@@ -2,7 +2,8 @@ package cmd
 
 import (
 	_ "github.com/solodba/binlog_parser/apps/all"
-	"github.com/solodba/binlog_parser/cmd/start"
+	"github.com/solodba/binlog_parser/cmd/list"
+	"github.com/solodba/binlog_parser/cmd/parse"
 	"github.com/solodba/binlog_parser/conf"
 	"github.com/solodba/mcube/apps"
 	"github.com/solodba/mcube/logger"
@@ -23,13 +24,13 @@ var (
 
 // 根命令
 var RootCmd = &cobra.Command{
-	Use:     "binlog-parser [init|start]",
+	Use:     "binlog-parser [init|list|parse]",
 	Short:   "binlog-parser service",
 	Long:    "binlog-parser service",
 	Example: "binlog-parser -v",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if showVersion {
-			logger.L().Info().Msgf(version.ShortVersion())
+			logger.L().Info().Msg(version.ShortVersion())
 			return nil
 		}
 		return cmd.Help()
@@ -66,7 +67,7 @@ func Initial() {
 // 执行函数
 func Execute() {
 	cobra.OnInitialize(Initial)
-	RootCmd.AddCommand(start.Cmd)
+	RootCmd.AddCommand(list.Cmd, parse.Cmd)
 	err := RootCmd.Execute()
 	cobra.CheckErr(err)
 }
