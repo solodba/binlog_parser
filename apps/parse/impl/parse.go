@@ -4,8 +4,15 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/solodba/binlog_parser/apps/parse"
+)
+
+var (
+	StartTime string
+	EndTime   string
 )
 
 // 查询binlog mode
@@ -112,8 +119,100 @@ func (i *impl) ParseBinLog(ctx context.Context) error {
 		return err
 	}
 	if !isBinlogRes.On {
-		return fmt.Errorf("%s", "数据库没有开启binlog!")
+		return fmt.Errorf("%s", "mysql数据库没有开启binlog!")
 	}
-
+	binlogRes, err := i.QueryBinLogFormat(ctx)
+	if err != nil {
+		return err
+	}
+	StartTime = i.c.CmdConf.StartTime
+	EndTime = i.c.CmdConf.EndTime
+	binlogParser := replication.NewBinlogParser()
+	if binlogRes.Value == "STATEMENT" {
+		err = binlogParser.ParseFile(i.c.CmdConf.BinLogName, 0, BinlogStatementEventHandler)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+// binlog处理函数
+func BinlogStatementEventHandler(be *replication.BinlogEvent) error {
+	if be.Header.EventType == replication.QUERY_EVENT {
+		ev, ok := be.Event.(*replication.QueryEvent)
+		if !ok {
+			return fmt.Errorf("%s", "数据类型断言失败!")
+		}
+		if StartTime != "" && EndTime == "" {
+			startTime, err := StringToTime(StartTime)
+			if err != nil {
+				return err
+			}
+			if TimestampToTime(be.Header.Timestamp).After(startTime) {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				fmt.Printf("schema: %s\n", ev.Schema)
+				fmt.Printf("sql: %s\n", string(ev.Query))
+				fmt.Printf("execute_time: %d\n", ev.ExecutionTime)
+			}
+		}
+		if StartTime == "" && EndTime != "" {
+			endTime, err := StringToTime(EndTime)
+			if err != nil {
+				return err
+			}
+			if TimestampToTime(be.Header.Timestamp).Before(endTime) {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				fmt.Printf("schema: %s\n", ev.Schema)
+				fmt.Printf("sql: %s\n", string(ev.Query))
+				fmt.Printf("execute_time: %d\n", ev.ExecutionTime)
+			}
+		}
+		if StartTime == "" && EndTime == "" {
+			fmt.Println("========================================================")
+			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+			fmt.Printf("schema: %s\n", ev.Schema)
+			fmt.Printf("sql: %s\n", string(ev.Query))
+			fmt.Printf("execute_time: %d\n", ev.ExecutionTime)
+		}
+		if StartTime != "" && EndTime != "" {
+			startTime, err := StringToTime(StartTime)
+			if err != nil {
+				return err
+			}
+			endTime, err := StringToTime(EndTime)
+			if err != nil {
+				return err
+			}
+			if TimestampToTime(be.Header.Timestamp).After(startTime) && TimestampToTime(be.Header.Timestamp).Before(endTime) {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				fmt.Printf("schema: %s\n", ev.Schema)
+				fmt.Printf("sql: %s\n", string(ev.Query))
+				fmt.Printf("execute_time: %d\n", ev.ExecutionTime)
+			}
+		}
+	}
+	return nil
+}
+
+func TimestampToTime(timestamp uint32) time.Time {
+	ts := int64(timestamp)
+	return time.Unix(ts, 0)
+}
+
+func TimestampToString(timestamp uint32) string {
+	ts := int64(timestamp)
+	t := time.Unix(ts, 0)
+	return t.Format("2006-01-02 15:04:05")
+}
+
+func StringToTime(t string) (time.Time, error) {
+	location, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.ParseInLocation("2006-01-02 15:04:05", t, location)
 }

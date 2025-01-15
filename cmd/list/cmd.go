@@ -8,8 +8,8 @@ import (
 // 项目启动子命令
 var Cmd = &cobra.Command{
 	Use:     "list",
-	Short:   "binlog-parser service",
-	Long:    "binlog-parser list service",
+	Short:   "binlog_parser service",
+	Long:    "binlog_parser list service",
 	Example: `./binlog_parser list -u root -p Root@123 -m 192.168.1.140 -P 3306`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		srv := NewServer()

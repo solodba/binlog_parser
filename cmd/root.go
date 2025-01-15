@@ -19,15 +19,16 @@ var (
 	Host        string
 	Port        int32
 	StartTime   string
+	Endtime     string
 	BinLogName  string
 )
 
 // 根命令
 var RootCmd = &cobra.Command{
-	Use:     "binlog-parser [init|list|parse]",
-	Short:   "binlog-parser service",
-	Long:    "binlog-parser service",
-	Example: "binlog-parser -v",
+	Use:     "binlog_parser [init|list|parse]",
+	Short:   "binlog_parser service",
+	Long:    "binlog_parser service",
+	Example: "binlog_parser -v",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if showVersion {
 			logger.L().Info().Msg(version.ShortVersion())
@@ -54,6 +55,7 @@ func LoadConfigFromCmd() {
 	conf.Conf.CmdConf.Host = Host
 	conf.Conf.CmdConf.Port = Port
 	conf.Conf.CmdConf.StartTime = StartTime
+	conf.Conf.CmdConf.EndTime = Endtime
 	conf.Conf.CmdConf.BinLogName = BinLogName
 }
 
@@ -79,6 +81,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&Password, "password", "p", "test", "connect mysql password")
 	RootCmd.PersistentFlags().StringVarP(&Host, "host", "m", "127.0.0.1", "mysql host ip")
 	RootCmd.PersistentFlags().Int32VarP(&Port, "port", "P", 3306, "mysql port")
-	RootCmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "1970-01-01 00:00:00", "mysql binlog parse start time")
+	RootCmd.PersistentFlags().StringVarP(&StartTime, "starttime", "s", "", "mysql binlog parse start time")
+	RootCmd.PersistentFlags().StringVarP(&Endtime, "endtime", "e", "", "mysql binlog parse end time")
 	RootCmd.PersistentFlags().StringVarP(&BinLogName, "binlogname", "f", "xxx", "mysql binlog name")
 }

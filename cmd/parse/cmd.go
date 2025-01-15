@@ -8,9 +8,9 @@ import (
 // 项目启动子命令
 var Cmd = &cobra.Command{
 	Use:     "parse",
-	Short:   "binlog-parser service",
-	Long:    "binlog-parser parse service",
-	Example: `./binlog_parser parse -u root -p Root@123 -m 192.168.1.140 -P 3306 -s "2023-08-30 23:50:00" -f mysql-bin.000009`,
+	Short:   "binlog_parser service",
+	Long:    "binlog_parser parse service",
+	Example: `./binlog_parser parse -u root -p Root@123 -m 192.168.1.140 -P 3306 -s "2023-08-30 23:50:00" -e "2023-08-30 24:00:00" -f mysql-bin.000009`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		srv := NewServer()
 		if err := srv.Parse(); err != nil {
