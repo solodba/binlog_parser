@@ -8,6 +8,7 @@ import (
 
 	"database/sql"
 
+	"github.com/go-mysql-org/go-mysql/mysql"
 	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/solodba/binlog_parser/apps/parse"
 )
@@ -212,12 +213,12 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 	case *replication.RowsEvent:
 		if be.Header.EventType == replication.WRITE_ROWS_EVENTv2 {
 			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
-			insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table))
+			insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
 			if err != nil {
 				return err
 			}
 			for _, row := range ev.Rows {
-				fmt.Printf("sql: %s\n", fmt.Sprintf(insertSqlString, row))
+				fmt.Printf("sql: %s\n", fmt.Sprintf(insertSqlString, row...))
 			}
 		}
 		return nil
@@ -227,34 +228,53 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 }
 
 // 生成列拼接字符串
-func (i *impl) GenColString(schemaName string, tableName string) (string, error) {
+func (i *impl) GenColList(schemaName string, tableName string) ([]string, error) {
 	colList := make([]string, 0)
 	sqlText := fmt.Sprintf(`show columns from %s from %s`, tableName, schemaName)
 	rows, err := i.db.QueryContext(context.Background(), sqlText)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var field, colType, isNull, key, isDefault, extra sql.NullString
 		err = rows.Scan(&field, &colType, &isNull, &key, &isDefault, &extra)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		if field.Valid {
 			colList = append(colList, field.String)
 		}
 	}
-	return strings.Join(colList, ","), nil
+	return colList, nil
 }
 
 // 生成插入语句字符串
-func (i *impl) GenInsertSqlString(schemaName string, tableName string) (string, error) {
-	colString, err := i.GenColString(schemaName, tableName)
+func (i *impl) GenInsertSqlString(schemaName string, tableName string, colTypeList []byte) (string, error) {
+	colList, err := i.GenColList(schemaName, tableName)
 	if err != nil {
 		return "", err
 	}
-	insertSqlString := fmt.Sprintf(`insert into %s.%s(%s) values(%v)`, schemaName, tableName, colString, "%s")
+	if len(colList) == 0 {
+		return "", fmt.Errorf("%s.%s表的列数为0", schemaName, tableName)
+	}
+	if len(colList) != len(colTypeList) {
+		return "", fmt.Errorf("%s.%s表的列数和值的个数不匹配", schemaName, tableName)
+	}
+	insertSqlString := fmt.Sprintf(`insert into %s.%s(%s) values(`, schemaName, tableName, strings.Join(colList, ","))
+	for _, item := range colTypeList {
+		switch item {
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+			insertSqlString = insertSqlString + "%d,"
+		case mysql.MYSQL_TYPE_VARCHAR:
+			insertSqlString = insertSqlString + "'%s',"
+		case mysql.MYSQL_TYPE_NULL:
+			insertSqlString = insertSqlString + "%s,"
+		default:
+			return "", fmt.Errorf("mysql不支持该数据类型")
+		}
+	}
+	insertSqlString = strings.TrimRight(insertSqlString, ",") + ");"
 	return insertSqlString, nil
 }
 

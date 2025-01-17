@@ -24,10 +24,10 @@ type Service interface {
 	GetBinLogPath(context.Context) (*BinLogPathResponse, error)
 	// 获取所有binglog路径
 	GetAllBinLogPath(context.Context) (*AllBinLogPathResponse, error)
-	// 生成列拼接
-	GenColString(string, string) (string, error)
+	// 生成列切片
+	GenColList(string, string) ([]string, error)
 	// 生成插入语句字符串
-	GenInsertSqlString(string, string) (string, error)
+	GenInsertSqlString(string, string, []byte) (string, error)
 	// binlog statement事件处理函数
 	BinlogStatementEventHandler(*replication.BinlogEvent) error
 	// binlog row事件处理函数

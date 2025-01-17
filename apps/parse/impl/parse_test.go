@@ -54,16 +54,16 @@ func TestGetAllBinLogPath(t *testing.T) {
 	t.Log(tools.MustToJson(allBinLogRes))
 }
 
-func TestGenColText(t *testing.T) {
-	colString, err := svc.GenColString("test", "hu")
+func TestGenColList(t *testing.T) {
+	colList, err := svc.GenColList("test", "hu")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(colString)
+	t.Log(colList)
 }
 
 func TestGenInsertSqlString(t *testing.T) {
-	insertSqlString, err := svc.GenInsertSqlString("test", "hu")
+	insertSqlString, err := svc.GenInsertSqlString("test", "hu", []byte{3, 15, 15, 3, 15})
 	if err != nil {
 		t.Fatal(err)
 	}
