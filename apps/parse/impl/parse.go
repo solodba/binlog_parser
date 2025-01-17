@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"database/sql"
+
 	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/solodba/binlog_parser/apps/parse"
 )
@@ -129,7 +131,13 @@ func (i *impl) ParseBinLog(ctx context.Context) error {
 	EndTime = i.c.CmdConf.EndTime
 	binlogParser := replication.NewBinlogParser()
 	if binlogRes.Value == "STATEMENT" {
-		err = binlogParser.ParseFile(i.c.CmdConf.BinLogName, 0, BinlogStatementEventHandler)
+		err = binlogParser.ParseFile(i.c.CmdConf.BinLogName, 0, i.BinlogStatementEventHandler)
+		if err != nil {
+			return err
+		}
+	}
+	if binlogRes.Value == "ROW" {
+		err = binlogParser.ParseFile(i.c.CmdConf.BinLogName, 0, i.BinlogRowEventHandler)
 		if err != nil {
 			return err
 		}
@@ -137,8 +145,8 @@ func (i *impl) ParseBinLog(ctx context.Context) error {
 	return nil
 }
 
-// binlog处理函数
-func BinlogStatementEventHandler(be *replication.BinlogEvent) error {
+// binlog statement事件处理函数
+func (i *impl) BinlogStatementEventHandler(be *replication.BinlogEvent) error {
 	if be.Header.EventType == replication.QUERY_EVENT {
 		ev, ok := be.Event.(*replication.QueryEvent)
 		if !ok {
@@ -196,6 +204,58 @@ func BinlogStatementEventHandler(be *replication.BinlogEvent) error {
 		}
 	}
 	return nil
+}
+
+// binlog row事件处理函数
+func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
+	switch ev := be.Event.(type) {
+	case *replication.RowsEvent:
+		if be.Header.EventType == replication.WRITE_ROWS_EVENTv2 {
+			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+			insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table))
+			if err != nil {
+				return err
+			}
+			for _, row := range ev.Rows {
+				fmt.Printf("sql: %s\n", fmt.Sprintf(insertSqlString, row))
+			}
+		}
+		return nil
+	default:
+		return nil
+	}
+}
+
+// 生成列拼接字符串
+func (i *impl) GenColString(schemaName string, tableName string) (string, error) {
+	colList := make([]string, 0)
+	sqlText := fmt.Sprintf(`show columns from %s from %s`, tableName, schemaName)
+	rows, err := i.db.QueryContext(context.Background(), sqlText)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var field, colType, isNull, key, isDefault, extra sql.NullString
+		err = rows.Scan(&field, &colType, &isNull, &key, &isDefault, &extra)
+		if err != nil {
+			return "", err
+		}
+		if field.Valid {
+			colList = append(colList, field.String)
+		}
+	}
+	return strings.Join(colList, ","), nil
+}
+
+// 生成插入语句字符串
+func (i *impl) GenInsertSqlString(schemaName string, tableName string) (string, error) {
+	colString, err := i.GenColString(schemaName, tableName)
+	if err != nil {
+		return "", err
+	}
+	insertSqlString := fmt.Sprintf(`insert into %s.%s(%s) values(%v)`, schemaName, tableName, colString, "%s")
+	return insertSqlString, nil
 }
 
 func TimestampToTime(timestamp uint32) time.Time {

@@ -53,3 +53,19 @@ func TestGetAllBinLogPath(t *testing.T) {
 	}
 	t.Log(tools.MustToJson(allBinLogRes))
 }
+
+func TestGenColText(t *testing.T) {
+	colString, err := svc.GenColString("test", "hu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(colString)
+}
+
+func TestGenInsertSqlString(t *testing.T) {
+	insertSqlString, err := svc.GenInsertSqlString("test", "hu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(insertSqlString)
+}
