@@ -69,3 +69,11 @@ func TestGenInsertSqlString(t *testing.T) {
 	}
 	t.Log(insertSqlString)
 }
+
+func TestQueryMysqlVersion(t *testing.T) {
+	version, err := svc.QueryMysqlVersion(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(version)
+}

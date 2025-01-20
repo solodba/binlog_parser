@@ -12,6 +12,8 @@ const (
 )
 
 type Service interface {
+	// 查询mysql版本
+	QueryMysqlVersion(context.Context) (string, error)
 	// 查询binlog mode
 	QueryBinLogMode(context.Context) (*BinLogResponse, error)
 	// 查询mysql server id

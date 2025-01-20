@@ -18,6 +18,18 @@ var (
 	EndTime   string
 )
 
+// 查询mysql版本
+func (i *impl) QueryMysqlVersion(ctx context.Context) (string, error) {
+	sql := `select version()`
+	row := i.db.QueryRowContext(ctx, sql)
+	version := ""
+	err := row.Scan(&version)
+	if err != nil {
+		return "", err
+	}
+	return version, nil
+}
+
 // 查询binlog mode
 func (i *impl) QueryBinLogMode(ctx context.Context) (*parse.BinLogResponse, error) {
 	sql := `show global variables like 'log_bin'`
@@ -95,6 +107,10 @@ func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathRespon
 	if err != nil {
 		return nil, err
 	}
+	version, err := i.QueryMysqlVersion(ctx)
+	if err != nil {
+		return nil, err
+	}
 	sql := `show binary logs`
 	allBinLogPath := parse.NewAllBinLogPathResponse()
 	rows, err := i.db.QueryContext(ctx, sql)
@@ -103,13 +119,25 @@ func (i *impl) GetAllBinLogPath(ctx context.Context) (*parse.AllBinLogPathRespon
 	}
 	defer rows.Close()
 	var logName, fileSize, encrypted string
-	for rows.Next() {
-		err = rows.Scan(&logName, &fileSize, &encrypted)
-		if err != nil {
-			return nil, err
+	if strings.Split(version, ".")[0] == "8" {
+		for rows.Next() {
+			err = rows.Scan(&logName, &fileSize, &encrypted)
+			if err != nil {
+				return nil, err
+			}
+			binLogPath := parse.NewBinLogPathResponse(binLogPathRes.BinLogPath + `/` + logName)
+			allBinLogPath.AddItems(binLogPath)
 		}
-		binLogPath := parse.NewBinLogPathResponse(binLogPathRes.BinLogPath + `/` + logName)
-		allBinLogPath.AddItems(binLogPath)
+	}
+	if strings.Split(version, ".")[0] == "5" {
+		for rows.Next() {
+			err = rows.Scan(&logName, &fileSize)
+			if err != nil {
+				return nil, err
+			}
+			binLogPath := parse.NewBinLogPathResponse(binLogPathRes.BinLogPath + `/` + logName)
+			allBinLogPath.AddItems(binLogPath)
+		}
 	}
 	allBinLogPath.Total = len(allBinLogPath.Items)
 	return allBinLogPath, nil
