@@ -249,6 +249,16 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 				fmt.Printf("sql: %s\n", fmt.Sprintf(insertSqlString, row...))
 			}
 		}
+		if be.Header.EventType == replication.DELETE_ROWS_EVENTv2 {
+			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+			deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+			if err != nil {
+				return err
+			}
+			for _, row := range ev.Rows {
+				fmt.Printf("sql: %s\n", fmt.Sprintf(deleteSqlString, row...))
+			}
+		}
 		return nil
 	default:
 		return nil
@@ -304,6 +314,35 @@ func (i *impl) GenInsertSqlString(schemaName string, tableName string, colTypeLi
 	}
 	insertSqlString = strings.TrimRight(insertSqlString, ",") + ");"
 	return insertSqlString, nil
+}
+
+// 生成删除语句字符串
+func (i *impl) GenDeleteSqlString(schemaName string, tableName string, colTypeList []byte) (string, error) {
+	colList, err := i.GenColList(schemaName, tableName)
+	if err != nil {
+		return "", err
+	}
+	if len(colList) == 0 {
+		return "", fmt.Errorf("%s.%s表的列数为0", schemaName, tableName)
+	}
+	if len(colList) != len(colTypeList) {
+		return "", fmt.Errorf("%s.%s表的列数和值的个数不匹配", schemaName, tableName)
+	}
+	deleteSqlString := fmt.Sprintf(`delete from %s.%s where `, schemaName, tableName)
+	for i := 0; i < len(colList); i++ {
+		switch colTypeList[i] {
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+			deleteSqlString = deleteSqlString + colList[i] + "=%d and "
+		case mysql.MYSQL_TYPE_VARCHAR:
+			deleteSqlString = deleteSqlString + colList[i] + "='%s' and "
+		case mysql.MYSQL_TYPE_NULL:
+			deleteSqlString = deleteSqlString + colList[i] + "=%s and "
+		default:
+			return "", fmt.Errorf("mysql不支持该数据类型")
+		}
+	}
+	deleteSqlString = strings.TrimRight(deleteSqlString, " and") + ";"
+	return deleteSqlString, nil
 }
 
 func TimestampToTime(timestamp uint32) time.Time {

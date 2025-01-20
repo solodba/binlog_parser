@@ -30,6 +30,8 @@ type Service interface {
 	GenColList(string, string) ([]string, error)
 	// 生成插入语句字符串
 	GenInsertSqlString(string, string, []byte) (string, error)
+	// 生成删除语句字符串
+	GenDeleteSqlString(string, string, []byte) (string, error)
 	// binlog statement事件处理函数
 	BinlogStatementEventHandler(*replication.BinlogEvent) error
 	// binlog row事件处理函数

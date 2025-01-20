@@ -77,3 +77,18 @@ func TestQueryMysqlVersion(t *testing.T) {
 	}
 	t.Log(version)
 }
+
+func TestGenDeleteSqlString(t *testing.T) {
+	deleteSqlString, err := svc.GenDeleteSqlString("test", "hu", []byte{3, 15, 15, 3, 15})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(deleteSqlString)
+}
+
+func TestParseBinLog(t *testing.T) {
+	err := svc.ParseBinLog(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
