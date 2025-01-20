@@ -28,6 +28,7 @@ func (m *ListService) List() error {
 	if allBinLogResp.Total == 0 {
 		return fmt.Errorf("%s", "mysql数据库没有找到binlog!")
 	}
+	fmt.Println("目前数据库所有binlog路径如下:")
 	for _, item := range allBinLogResp.Items {
 		fmt.Println(item.BinLogPath)
 	}
