@@ -415,6 +415,142 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 				}
 			}
 		}
+		if be.Header.EventType == replication.UPDATE_ROWS_EVENTv2 {
+			if StartTime != "" && EndTime == "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					for n := 0; n < len(ev.Rows); n++ {
+						if (n+1)%2 == 1 {
+							updateSqlString1, err := i.GenUpdateSqlString1(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							updateSqlString2, err := i.GenUpdateSqlString2(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							sql1 := fmt.Sprintf(updateSqlString1, ev.Rows[n+1]...)
+							sql2 := fmt.Sprintf(updateSqlString2, ev.Rows[n]...)
+							if strings.Split(sql1, " ")[0] == "update" {
+								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+							}
+							if strings.Split(sql2, " ")[1] == "where" {
+								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+							}
+							sql := sql1 + sql2
+							fmt.Println(sql)
+						}
+					}
+				}
+			}
+			if StartTime == "" && EndTime != "" {
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					for n := 0; n < len(ev.Rows); n++ {
+						if (n+1)%2 == 1 {
+							updateSqlString1, err := i.GenUpdateSqlString1(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							updateSqlString2, err := i.GenUpdateSqlString2(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							sql1 := fmt.Sprintf(updateSqlString1, ev.Rows[n+1]...)
+							sql2 := fmt.Sprintf(updateSqlString2, ev.Rows[n]...)
+							if strings.Split(sql1, " ")[0] == "update" {
+								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+							}
+							if strings.Split(sql2, " ")[1] == "where" {
+								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+							}
+							sql := sql1 + sql2
+							fmt.Println(sql)
+						}
+					}
+				}
+			}
+			if StartTime == "" && EndTime == "" {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				for n := 0; n < len(ev.Rows); n++ {
+					if (n+1)%2 == 1 {
+						updateSqlString1, err := i.GenUpdateSqlString1(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+						if err != nil {
+							return err
+						}
+						updateSqlString2, err := i.GenUpdateSqlString2(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+						if err != nil {
+							return err
+						}
+						sql1 := fmt.Sprintf(updateSqlString1, ev.Rows[n+1]...)
+						sql2 := fmt.Sprintf(updateSqlString2, ev.Rows[n]...)
+						if strings.Split(sql1, " ")[0] == "update" {
+							sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
+							sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+						}
+						if strings.Split(sql2, " ")[1] == "where" {
+							sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
+							sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+						}
+						sql := sql1 + sql2
+						fmt.Println(sql)
+					}
+				}
+			}
+			if StartTime != "" && EndTime != "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) && TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					for n := 0; n < len(ev.Rows); n++ {
+						if (n+1)%2 == 1 {
+							updateSqlString1, err := i.GenUpdateSqlString1(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							updateSqlString2, err := i.GenUpdateSqlString2(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+							if err != nil {
+								return err
+							}
+							sql1 := fmt.Sprintf(updateSqlString1, ev.Rows[n+1]...)
+							sql2 := fmt.Sprintf(updateSqlString2, ev.Rows[n]...)
+							if strings.Split(sql1, " ")[0] == "update" {
+								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+							}
+							if strings.Split(sql2, " ")[1] == "where" {
+								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+							}
+							sql := sql1 + sql2
+							fmt.Println(sql)
+						}
+					}
+				}
+			}
+		}
 		return nil
 	default:
 		return nil
@@ -492,13 +628,70 @@ func (i *impl) GenDeleteSqlString(schemaName string, tableName string, colTypeLi
 		case mysql.MYSQL_TYPE_VARCHAR:
 			deleteSqlString = deleteSqlString + colList[i] + "='%s' and "
 		case mysql.MYSQL_TYPE_NULL:
-			deleteSqlString = deleteSqlString + colList[i] + "=%s and "
+			deleteSqlString = deleteSqlString + colList[i] + "='%s' and "
 		default:
 			return "", fmt.Errorf("mysql不支持该数据类型")
 		}
 	}
 	deleteSqlString = strings.TrimSuffix(deleteSqlString, " and ") + ";"
 	return deleteSqlString, nil
+}
+
+// 生成更新语句字符串
+func (i *impl) GenUpdateSqlString1(schemaName string, tableName string, colTypeList []byte) (string, error) {
+	colList, err := i.GenColList(schemaName, tableName)
+	if err != nil {
+		return "", err
+	}
+	if len(colList) == 0 {
+		return "", fmt.Errorf("%s.%s表的列数为0", schemaName, tableName)
+	}
+	if len(colList) != len(colTypeList) {
+		return "", fmt.Errorf("%s.%s表的列数和值的个数不匹配", schemaName, tableName)
+	}
+	updateSqlString := fmt.Sprintf(`update %s.%s set `, schemaName, tableName)
+	for i := 0; i < len(colList); i++ {
+		switch colTypeList[i] {
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+			updateSqlString = updateSqlString + colList[i] + "=%d,"
+		case mysql.MYSQL_TYPE_VARCHAR:
+			updateSqlString = updateSqlString + colList[i] + "='%s',"
+		case mysql.MYSQL_TYPE_NULL:
+			updateSqlString = updateSqlString + colList[i] + "='%s',"
+		default:
+			return "", fmt.Errorf("mysql不支持该数据类型")
+		}
+	}
+	updateSqlString = strings.TrimSuffix(updateSqlString, ",")
+	return updateSqlString, nil
+}
+
+func (i *impl) GenUpdateSqlString2(schemaName string, tableName string, colTypeList []byte) (string, error) {
+	colList, err := i.GenColList(schemaName, tableName)
+	if err != nil {
+		return "", err
+	}
+	if len(colList) == 0 {
+		return "", fmt.Errorf("%s.%s表的列数为0", schemaName, tableName)
+	}
+	if len(colList) != len(colTypeList) {
+		return "", fmt.Errorf("%s.%s表的列数和值的个数不匹配", schemaName, tableName)
+	}
+	updateSqlString := " where "
+	for i := 0; i < len(colList); i++ {
+		switch colTypeList[i] {
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+			updateSqlString = updateSqlString + colList[i] + "=%d and "
+		case mysql.MYSQL_TYPE_VARCHAR:
+			updateSqlString = updateSqlString + colList[i] + "='%s' and "
+		case mysql.MYSQL_TYPE_NULL:
+			updateSqlString = updateSqlString + colList[i] + "='%s' and "
+		default:
+			return "", fmt.Errorf("mysql不支持该数据类型")
+		}
+	}
+	updateSqlString = strings.TrimSuffix(updateSqlString, " and ") + ";"
+	return updateSqlString, nil
 }
 
 func TimestampToTime(timestamp uint32) time.Time {
