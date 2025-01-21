@@ -468,7 +468,7 @@ func (i *impl) GenInsertSqlString(schemaName string, tableName string, colTypeLi
 			return "", fmt.Errorf("mysql不支持该数据类型")
 		}
 	}
-	insertSqlString = strings.TrimRight(insertSqlString, ",") + ");"
+	insertSqlString = strings.TrimSuffix(insertSqlString, ",") + ");"
 	return insertSqlString, nil
 }
 
@@ -497,7 +497,7 @@ func (i *impl) GenDeleteSqlString(schemaName string, tableName string, colTypeLi
 			return "", fmt.Errorf("mysql不支持该数据类型")
 		}
 	}
-	deleteSqlString = strings.TrimRight(deleteSqlString, " and") + ";"
+	deleteSqlString = strings.TrimSuffix(deleteSqlString, " and ") + ";"
 	return deleteSqlString, nil
 }
 

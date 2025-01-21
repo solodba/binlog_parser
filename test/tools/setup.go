@@ -11,10 +11,9 @@ func LoadConfig() {
 	conf.Conf = conf.NewDefaultConfig()
 	conf.Conf.MySQL.Username = "root"
 	conf.Conf.MySQL.Password = "Root@123"
-	conf.Conf.MySQL.Host = "192.168.1.140"
-	conf.Conf.MySQL.Port = 13306
-	conf.Conf.CmdConf.StartTime = "2025-01-21 20:00:00"
-	conf.Conf.CmdConf.BinLogName = "master-bin.000018"
+	conf.Conf.MySQL.Host = "192.168.1.100"
+	conf.Conf.MySQL.Port = 3306
+	conf.Conf.CmdConf.BinLogName = "mysql-bin.000010"
 	conf.Conf.MySQL.MaxOpenConn = 50
 	conf.Conf.MySQL.MaxIdleConn = 10
 	conf.Conf.MySQL.MaxLifeTime = 600
