@@ -13,8 +13,7 @@ func LoadConfig() {
 	conf.Conf.MySQL.Password = "Root@123"
 	conf.Conf.MySQL.Host = "192.168.1.140"
 	conf.Conf.MySQL.Port = 13306
-	conf.Conf.CmdConf.StartTime = "2025-01-20 18:00:00"
-	conf.Conf.CmdConf.EndTime = "2025-01-20 19:00:00"
+	conf.Conf.CmdConf.EndTime = "2025-01-20 23:00:00"
 	conf.Conf.CmdConf.BinLogName = "master-bin.000018"
 	conf.Conf.MySQL.MaxOpenConn = 50
 	conf.Conf.MySQL.MaxIdleConn = 10

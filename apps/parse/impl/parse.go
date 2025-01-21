@@ -240,23 +240,179 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 	switch ev := be.Event.(type) {
 	case *replication.RowsEvent:
 		if be.Header.EventType == replication.WRITE_ROWS_EVENTv2 {
-			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
-			insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
-			if err != nil {
-				return err
+			if StartTime != "" && EndTime == "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(insertSqlString, row...)
+						if strings.Split(sql, " ")[0] == "insert" {
+							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
+							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+						}
+						fmt.Println(sql)
+					}
+				}
 			}
-			for _, row := range ev.Rows {
-				fmt.Printf("sql: %s\n", fmt.Sprintf(insertSqlString, row...))
+			if StartTime == "" && EndTime != "" {
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(insertSqlString, row...)
+						if strings.Split(sql, " ")[0] == "insert" {
+							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
+							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+						}
+						fmt.Println(sql)
+					}
+				}
+			}
+			if StartTime == "" && EndTime == "" {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+				if err != nil {
+					return err
+				}
+				for _, row := range ev.Rows {
+					sql := fmt.Sprintf(insertSqlString, row...)
+					if strings.Split(sql, " ")[0] == "insert" {
+						sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
+						sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+					}
+					fmt.Println(sql)
+				}
+			}
+			if StartTime != "" && EndTime != "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) && TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					insertSqlString, err := i.GenInsertSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(insertSqlString, row...)
+						if strings.Split(sql, " ")[0] == "insert" {
+							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
+							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+						}
+						fmt.Println(sql)
+					}
+				}
 			}
 		}
 		if be.Header.EventType == replication.DELETE_ROWS_EVENTv2 {
-			fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
-			deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
-			if err != nil {
-				return err
+			if StartTime != "" && EndTime == "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(deleteSqlString, row...)
+						if strings.Split(sql, " ")[0] == "delete" {
+							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
+							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+						}
+						fmt.Println(sql)
+					}
+				}
 			}
-			for _, row := range ev.Rows {
-				fmt.Printf("sql: %s\n", fmt.Sprintf(deleteSqlString, row...))
+			if StartTime == "" && EndTime != "" {
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(deleteSqlString, row...)
+						if strings.Split(sql, " ")[0] == "delete" {
+							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
+							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+						}
+						fmt.Println(sql)
+					}
+				}
+			}
+			if StartTime == "" && EndTime == "" {
+				fmt.Println("========================================================")
+				fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+				deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+				if err != nil {
+					return err
+				}
+				for _, row := range ev.Rows {
+					sql := fmt.Sprintf(deleteSqlString, row...)
+					if strings.Split(sql, " ")[0] == "delete" {
+						sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
+						sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+					}
+					fmt.Println(sql)
+				}
+			}
+			if StartTime != "" && EndTime != "" {
+				startTime, err := StringToTime(StartTime)
+				if err != nil {
+					return err
+				}
+				endTime, err := StringToTime(EndTime)
+				if err != nil {
+					return err
+				}
+				if TimestampToTime(be.Header.Timestamp).After(startTime) && TimestampToTime(be.Header.Timestamp).Before(endTime) {
+					fmt.Println("========================================================")
+					fmt.Printf("timestamp: %s\n", TimestampToString(be.Header.Timestamp))
+					deleteSqlString, err := i.GenDeleteSqlString(string(ev.Table.Schema), string(ev.Table.Table), ev.Table.ColumnType)
+					if err != nil {
+						return err
+					}
+					for _, row := range ev.Rows {
+						sql := fmt.Sprintf(deleteSqlString, row...)
+						if strings.Split(sql, " ")[0] == "delete" {
+							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
+							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+						}
+						fmt.Println(sql)
+					}
+				}
 			}
 		}
 		return nil
