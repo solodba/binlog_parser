@@ -257,6 +257,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "insert" {
 							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
 							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "%!f(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "<nil>", "null")
 						}
 						fmt.Println(sql)
 					}
@@ -279,6 +281,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "insert" {
 							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
 							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "%!f(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "<nil>", "null")
 						}
 						fmt.Println(sql)
 					}
@@ -296,6 +300,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 					if strings.Split(sql, " ")[0] == "insert" {
 						sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
 						sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+						sql = strings.ReplaceAll(sql, "%!f(<nil>)", "null")
+						sql = strings.ReplaceAll(sql, "<nil>", "null")
 					}
 					fmt.Println(sql)
 				}
@@ -321,6 +327,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "insert" {
 							sql = strings.ReplaceAll(sql, "'%!s(<nil>)'", "null")
 							sql = strings.ReplaceAll(sql, "%!d(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "%!f(<nil>)", "null")
+							sql = strings.ReplaceAll(sql, "<nil>", "null")
 						}
 						fmt.Println(sql)
 					}
@@ -345,6 +353,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "delete" {
 							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
 							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=%!f(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=<nil>", " is null")
 						}
 						fmt.Println(sql)
 					}
@@ -367,6 +377,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "delete" {
 							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
 							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=%!f(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=<nil>", " is null")
 						}
 						fmt.Println(sql)
 					}
@@ -384,6 +396,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 					if strings.Split(sql, " ")[0] == "delete" {
 						sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
 						sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+						sql = strings.ReplaceAll(sql, "=%!f(<nil>)", " is null")
+						sql = strings.ReplaceAll(sql, "=<nil>", " is null")
 					}
 					fmt.Println(sql)
 				}
@@ -409,6 +423,8 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql, " ")[0] == "delete" {
 							sql = strings.ReplaceAll(sql, "='%!s(<nil>)'", " is null")
 							sql = strings.ReplaceAll(sql, "=%!d(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=%!f(<nil>)", " is null")
+							sql = strings.ReplaceAll(sql, "=<nil>", " is null")
 						}
 						fmt.Println(sql)
 					}
@@ -439,10 +455,14 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 							if strings.Split(sql1, " ")[0] == "update" {
 								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
 								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!f(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "<nil>", "null")
 							}
 							if strings.Split(sql2, " ")[1] == "where" {
 								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
 								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!f(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=<nil>", " is null")
 							}
 							sql := sql1 + sql2
 							fmt.Println(sql)
@@ -473,10 +493,14 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 							if strings.Split(sql1, " ")[0] == "update" {
 								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
 								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!f(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "<nil>", "null")
 							}
 							if strings.Split(sql2, " ")[1] == "where" {
 								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
 								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!f(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=<nil>", " is null")
 							}
 							sql := sql1 + sql2
 							fmt.Println(sql)
@@ -502,10 +526,14 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 						if strings.Split(sql1, " ")[0] == "update" {
 							sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
 							sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+							sql1 = strings.ReplaceAll(sql1, "%!f(<nil>)", "null")
+							sql1 = strings.ReplaceAll(sql1, "<nil>", "null")
 						}
 						if strings.Split(sql2, " ")[1] == "where" {
 							sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
 							sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+							sql2 = strings.ReplaceAll(sql2, "=%!f(<nil>)", " is null")
+							sql2 = strings.ReplaceAll(sql2, "=<nil>", " is null")
 						}
 						sql := sql1 + sql2
 						fmt.Println(sql)
@@ -539,10 +567,14 @@ func (i *impl) BinlogRowEventHandler(be *replication.BinlogEvent) error {
 							if strings.Split(sql1, " ")[0] == "update" {
 								sql1 = strings.ReplaceAll(sql1, "'%!s(<nil>)'", "null")
 								sql1 = strings.ReplaceAll(sql1, "%!d(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "%!f(<nil>)", "null")
+								sql1 = strings.ReplaceAll(sql1, "<nil>", "null")
 							}
 							if strings.Split(sql2, " ")[1] == "where" {
 								sql2 = strings.ReplaceAll(sql2, "='%!s(<nil>)'", " is null")
 								sql2 = strings.ReplaceAll(sql2, "=%!d(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=%!f(<nil>)", " is null")
+								sql2 = strings.ReplaceAll(sql2, "=<nil>", " is null")
 							}
 							sql := sql1 + sql2
 							fmt.Println(sql)
@@ -594,10 +626,14 @@ func (i *impl) GenInsertSqlString(schemaName string, tableName string, colTypeLi
 	insertSqlString := fmt.Sprintf(`insert into %s.%s(%s) values(`, schemaName, tableName, strings.Join(colList, ","))
 	for _, item := range colTypeList {
 		switch item {
-		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG, mysql.MYSQL_TYPE_INT24, mysql.MYSQL_TYPE_LONGLONG:
 			insertSqlString = insertSqlString + "%d,"
-		case mysql.MYSQL_TYPE_VARCHAR:
+		case mysql.MYSQL_TYPE_VARCHAR, mysql.MYSQL_TYPE_DATETIME, mysql.MYSQL_TYPE_DATETIME2, mysql.MYSQL_TYPE_TIMESTAMP, mysql.MYSQL_TYPE_TIMESTAMP2, mysql.MYSQL_TYPE_DATE, mysql.MYSQL_TYPE_TIME, mysql.MYSQL_TYPE_TIME2, mysql.MYSQL_TYPE_YEAR, mysql.MYSQL_TYPE_NEWDATE:
 			insertSqlString = insertSqlString + "'%s',"
+		case mysql.MYSQL_TYPE_FLOAT, mysql.MYSQL_TYPE_DOUBLE:
+			insertSqlString = insertSqlString + "%f,"
+		case mysql.MYSQL_TYPE_DECIMAL, mysql.MYSQL_TYPE_NEWDECIMAL, mysql.MYSQL_TYPE_JSON, mysql.MYSQL_TYPE_ENUM, mysql.MYSQL_TYPE_SET, mysql.MYSQL_TYPE_TINY_BLOB, mysql.MYSQL_TYPE_MEDIUM_BLOB, mysql.MYSQL_TYPE_LONG_BLOB, mysql.MYSQL_TYPE_BLOB, mysql.MYSQL_TYPE_VAR_STRING, mysql.MYSQL_TYPE_STRING, mysql.MYSQL_TYPE_GEOMETRY:
+			insertSqlString = insertSqlString + "%v,"
 		case mysql.MYSQL_TYPE_NULL:
 			insertSqlString = insertSqlString + "%s,"
 		default:
@@ -623,10 +659,14 @@ func (i *impl) GenDeleteSqlString(schemaName string, tableName string, colTypeLi
 	deleteSqlString := fmt.Sprintf(`delete from %s.%s where `, schemaName, tableName)
 	for i := 0; i < len(colList); i++ {
 		switch colTypeList[i] {
-		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG, mysql.MYSQL_TYPE_INT24, mysql.MYSQL_TYPE_LONGLONG:
 			deleteSqlString = deleteSqlString + colList[i] + "=%d and "
-		case mysql.MYSQL_TYPE_VARCHAR:
+		case mysql.MYSQL_TYPE_VARCHAR, mysql.MYSQL_TYPE_DATETIME, mysql.MYSQL_TYPE_DATETIME2, mysql.MYSQL_TYPE_TIMESTAMP, mysql.MYSQL_TYPE_TIMESTAMP2, mysql.MYSQL_TYPE_DATE, mysql.MYSQL_TYPE_TIME, mysql.MYSQL_TYPE_TIME2, mysql.MYSQL_TYPE_YEAR, mysql.MYSQL_TYPE_NEWDATE:
 			deleteSqlString = deleteSqlString + colList[i] + "='%s' and "
+		case mysql.MYSQL_TYPE_FLOAT, mysql.MYSQL_TYPE_DOUBLE:
+			deleteSqlString = deleteSqlString + colList[i] + "=%f and "
+		case mysql.MYSQL_TYPE_DECIMAL, mysql.MYSQL_TYPE_NEWDECIMAL, mysql.MYSQL_TYPE_JSON, mysql.MYSQL_TYPE_ENUM, mysql.MYSQL_TYPE_SET, mysql.MYSQL_TYPE_TINY_BLOB, mysql.MYSQL_TYPE_MEDIUM_BLOB, mysql.MYSQL_TYPE_LONG_BLOB, mysql.MYSQL_TYPE_BLOB, mysql.MYSQL_TYPE_VAR_STRING, mysql.MYSQL_TYPE_STRING, mysql.MYSQL_TYPE_GEOMETRY:
+			deleteSqlString = deleteSqlString + colList[i] + "=%v and "
 		case mysql.MYSQL_TYPE_NULL:
 			deleteSqlString = deleteSqlString + colList[i] + "='%s' and "
 		default:
@@ -652,10 +692,14 @@ func (i *impl) GenUpdateSqlString1(schemaName string, tableName string, colTypeL
 	updateSqlString := fmt.Sprintf(`update %s.%s set `, schemaName, tableName)
 	for i := 0; i < len(colList); i++ {
 		switch colTypeList[i] {
-		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG, mysql.MYSQL_TYPE_INT24, mysql.MYSQL_TYPE_LONGLONG:
 			updateSqlString = updateSqlString + colList[i] + "=%d,"
-		case mysql.MYSQL_TYPE_VARCHAR:
+		case mysql.MYSQL_TYPE_VARCHAR, mysql.MYSQL_TYPE_DATETIME, mysql.MYSQL_TYPE_DATETIME2, mysql.MYSQL_TYPE_TIMESTAMP, mysql.MYSQL_TYPE_TIMESTAMP2, mysql.MYSQL_TYPE_DATE, mysql.MYSQL_TYPE_TIME, mysql.MYSQL_TYPE_TIME2, mysql.MYSQL_TYPE_YEAR, mysql.MYSQL_TYPE_NEWDATE:
 			updateSqlString = updateSqlString + colList[i] + "='%s',"
+		case mysql.MYSQL_TYPE_FLOAT, mysql.MYSQL_TYPE_DOUBLE:
+			updateSqlString = updateSqlString + colList[i] + "=%f,"
+		case mysql.MYSQL_TYPE_DECIMAL, mysql.MYSQL_TYPE_NEWDECIMAL, mysql.MYSQL_TYPE_JSON, mysql.MYSQL_TYPE_ENUM, mysql.MYSQL_TYPE_SET, mysql.MYSQL_TYPE_TINY_BLOB, mysql.MYSQL_TYPE_MEDIUM_BLOB, mysql.MYSQL_TYPE_LONG_BLOB, mysql.MYSQL_TYPE_BLOB, mysql.MYSQL_TYPE_VAR_STRING, mysql.MYSQL_TYPE_STRING, mysql.MYSQL_TYPE_GEOMETRY:
+			updateSqlString = updateSqlString + colList[i] + "=%v,"
 		case mysql.MYSQL_TYPE_NULL:
 			updateSqlString = updateSqlString + colList[i] + "='%s',"
 		default:
@@ -680,10 +724,14 @@ func (i *impl) GenUpdateSqlString2(schemaName string, tableName string, colTypeL
 	updateSqlString := " where "
 	for i := 0; i < len(colList); i++ {
 		switch colTypeList[i] {
-		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG:
+		case mysql.MYSQL_TYPE_TINY, mysql.MYSQL_TYPE_SHORT, mysql.MYSQL_TYPE_LONG, mysql.MYSQL_TYPE_INT24, mysql.MYSQL_TYPE_LONGLONG:
 			updateSqlString = updateSqlString + colList[i] + "=%d and "
-		case mysql.MYSQL_TYPE_VARCHAR:
+		case mysql.MYSQL_TYPE_VARCHAR, mysql.MYSQL_TYPE_DATETIME, mysql.MYSQL_TYPE_DATETIME2, mysql.MYSQL_TYPE_TIMESTAMP, mysql.MYSQL_TYPE_TIMESTAMP2, mysql.MYSQL_TYPE_DATE, mysql.MYSQL_TYPE_TIME, mysql.MYSQL_TYPE_TIME2, mysql.MYSQL_TYPE_YEAR, mysql.MYSQL_TYPE_NEWDATE:
 			updateSqlString = updateSqlString + colList[i] + "='%s' and "
+		case mysql.MYSQL_TYPE_FLOAT, mysql.MYSQL_TYPE_DOUBLE:
+			updateSqlString = updateSqlString + colList[i] + "=%f and "
+		case mysql.MYSQL_TYPE_DECIMAL, mysql.MYSQL_TYPE_NEWDECIMAL, mysql.MYSQL_TYPE_JSON, mysql.MYSQL_TYPE_ENUM, mysql.MYSQL_TYPE_SET, mysql.MYSQL_TYPE_TINY_BLOB, mysql.MYSQL_TYPE_MEDIUM_BLOB, mysql.MYSQL_TYPE_LONG_BLOB, mysql.MYSQL_TYPE_BLOB, mysql.MYSQL_TYPE_VAR_STRING, mysql.MYSQL_TYPE_STRING, mysql.MYSQL_TYPE_GEOMETRY:
+			updateSqlString = updateSqlString + colList[i] + "=%v and "
 		case mysql.MYSQL_TYPE_NULL:
 			updateSqlString = updateSqlString + colList[i] + "='%s' and "
 		default:
